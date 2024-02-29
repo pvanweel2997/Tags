@@ -7,6 +7,7 @@ import { UserEntity } from '@app/user/user.entity';
 import { ArticleResponseInterface } from './types/articleResponse.interface';
 import slugify from 'slugify';
 import { ArticlesResponseInterface } from './types/articlesResponse.interface';
+import { UserService } from '@app/user/user.service';
 
 @Injectable()
 export class ArticleService {
@@ -127,6 +128,32 @@ export class ArticleService {
     }
     Object.assign(article, updateArticleDto);
     return this.articleRepository.save(article);
+  }
+
+  async addArticleToFavorites(
+    slug: string,
+    currentUserId: number,
+  ): Promise<ArticleEntity> {
+    const article = await this.findBySlug(slug);
+    const user = await this.userRepository.findOne({
+      where: {
+        id: currentUserId,
+      },
+      relations: ['favorites'],
+    });
+    const isNotFavorited =
+      user.favorites.findIndex(
+        (articlesInFavorites) => articlesInFavorites.id === article.id,
+      ) === -1;
+
+    if (isNotFavorited) {
+      user.favorites.push(article);
+      article.favoritescount++;
+    }
+    await this.userRepository.save(user);
+    await this.articleRepository.save(article);
+
+    return article;
   }
 
   buildArticleResponse(article: ArticleEntity): ArticleResponseInterface {

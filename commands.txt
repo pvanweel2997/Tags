@@ -5,6 +5,7 @@ npm run start:dev
 yarn add module-alias
 npm i module-alias
 yarn add nodemon
+npm run start
 psql postgres postgres
 	\l
 	\du
@@ -32,6 +33,8 @@ yarn db:migrate
 yarn db:create src/migrations/AddRelationsBetweenArticleAndUser
 yarn db:migrate
 npm i slugify
+yarn db:create src/migrations/AddFavoriteRelationsBetweenArticleAndUser
+yarn db:migrate
 
 
 
