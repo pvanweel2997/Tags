@@ -25,20 +25,20 @@ export class ArticleEntity {
   body: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  createdat: Date;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  updatedAt: Date;
+  updatedat: Date;
 
   @Column('simple-array')
-  tagList: string[];
+  taglist: string[];
 
   @Column({ default: 0 })
-  favoritesCount: number;
+  favoritescount: number;
 
   @BeforeUpdate()
   updateTimeStamp() {
-    this.updatedAt = new Date();
+    this.updatedat = new Date();
   }
 
   @ManyToOne(() => UserEntity, (user) => user.articles, { eager: true })
