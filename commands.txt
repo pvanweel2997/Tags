@@ -1,0 +1,38 @@
+npm config set strict-ssl false
+npm i -g @nestjs/cli
+nest new mediumclone_nestjs
+npm run start:dev
+yarn add module-alias
+npm i module-alias
+yarn add nodemon
+psql postgres postgres
+	\l
+	\du
+	create database mediumclone;
+	create user mediumclone with encrypted password 'password';
+	grant all privileges on database mediumclone to mediumclone;
+	grant all on schema public to mediumclone;
+	\c mediumclone  (connects to database mediumclone)
+	
+yarn add typeorm
+yarn add @nestjs/typeorm
+yarn add pg
+yarn db:drop
+yarn db:create src/migrations/CreateTags
+yarn db:migrate
+npm i bcrypt
+yarn db:create src/migrations/CreateUsers
+npm i jsonwebtoken
+yarn db:create src/migrations/AddUsernameToUsers
+yarn db:migrate
+npm install class-validator
+npm install class-transformer
+yarn db:create src/migrations/CreateArticles
+yarn db:migrate
+
+
+
+
+
+
+git config --global --add safe.directory C:/courses/NestJsApiScratch/mediumclone_nestjs
