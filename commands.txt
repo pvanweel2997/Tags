@@ -31,6 +31,7 @@ yarn db:create src/migrations/CreateArticles
 yarn db:migrate
 yarn db:create src/migrations/AddRelationsBetweenArticleAndUser
 yarn db:migrate
+npm i slugify
 
 
 
