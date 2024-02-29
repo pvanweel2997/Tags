@@ -35,13 +35,18 @@ export class UserService {
     }
     const newUser = new UserEntity();
     Object.assign(newUser, createUserDto);
-    console.log('=== newUser', newUser);
     return await this.userRepository.save(newUser);
   }
 
   async findUserByEmail(loginUserDto: LoginUserDto): Promise<UserEntity> {
     return await this.userRepository.findOneBy({
       email: loginUserDto.email,
+    });
+  }
+
+  async findById(id: number): Promise<UserEntity> {
+    return this.userRepository.findOneBy({
+      id,
     });
   }
 
