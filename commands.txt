@@ -29,6 +29,8 @@ npm install class-validator
 npm install class-transformer
 yarn db:create src/migrations/CreateArticles
 yarn db:migrate
+yarn db:create src/migrations/AddRelationsBetweenArticleAndUser
+yarn db:migrate
 
 
 
