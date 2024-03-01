@@ -9,17 +9,17 @@ import {
   Query,
   UseGuards,
   UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
-import { ArticleService } from './article.service';
+import { ArticleService } from '@app/article/article.service';
 import { AuthGuard } from '@app/user/guards/auth.guard';
-import { CreateArticleDto } from './dto/createArticle.dto';
+import { CreateArticleDto } from '@app/article/dto/createArticle.dto';
 import { User } from '@app/user/decorators/user.decorator';
 import { UserEntity } from '@app/user/user.entity';
-import { ArticleResponseInterface } from './types/articleResponse.interface';
-import { ArticleEntity } from './article.entity';
+import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
+import { ArticleEntity } from '@app/article/article.entity';
 import { DeleteResult } from 'typeorm';
-import { ArticlesResponseInterface } from './types/articlesResponse.interface';
+import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.interface';
+import { BackendValidationPipe } from '@app/shared/pipes/backendValidation.pipe';
 
 @Controller('articles')
 @UseGuards(AuthGuard)
@@ -45,6 +45,7 @@ export class ArticleController {
 
   @Post()
   @UseGuards(AuthGuard)
+  @UsePipes(new BackendValidationPipe())
   async createArticle(
     @User() currentUser: UserEntity,
     @Body('article') createArticleDTO: CreateArticleDto,
@@ -74,7 +75,7 @@ export class ArticleController {
 
   @Put(':slug')
   @UseGuards(AuthGuard)
-  @UsePipes(new ValidationPipe())
+  @UsePipes(new BackendValidationPipe())
   async updateArticle(
     @Param('slug') slug: string,
     @User('id') currentUserId: number,
