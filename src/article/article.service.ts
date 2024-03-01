@@ -50,8 +50,22 @@ export class ArticleService {
       });
     }
 
-    queryBuilder.orderBy('articles.createdat', 'DESC');
+    if (query.favorited) {
+      const author = await this.userRepository.findOne({
+        where: {
+          username: query.favorited,
+        },
+        relations: ['favorites'],
+      });
+      const ids = author.favorites.map((favorite) => favorite.id);
+      if (ids.length > 0) {
+        queryBuilder.andWhere('articles.id IN (:...ids)', { ids });
+      } else {
+        queryBuilder.andWhere('1=0');
+      }
+    }
 
+    queryBuilder.orderBy('articles.createdat', 'DESC');
     const articlesCount = await queryBuilder.getCount();
     if (query.limit) {
       queryBuilder.limit(query.limit);
@@ -61,9 +75,24 @@ export class ArticleService {
       queryBuilder.offset(query.offset);
     }
 
-    const articles = await queryBuilder.getMany();
+    let favoriteIds: number[] = [];
+    if (currentUserId) {
+      const currentUser = await this.userRepository.findOne({
+        where: {
+          id: currentUserId,
+        },
+        relations: ['favorites'],
+      });
+      favoriteIds = currentUser.favorites.map((favorite) => favorite.id);
+    }
 
-    return { articles, articlesCount };
+    const articles = await queryBuilder.getMany();
+    const articlesWithFavorited = articles.map((article) => {
+      const favorited = favoriteIds.includes(article.id);
+      return { ...article, favorited };
+    });
+
+    return { articles: articlesWithFavorited, articlesCount };
   }
 
   async createArticle(
@@ -149,9 +178,33 @@ export class ArticleService {
     if (isNotFavorited) {
       user.favorites.push(article);
       article.favoritescount++;
+      await this.userRepository.save(user);
+      await this.articleRepository.save(article);
     }
-    await this.userRepository.save(user);
-    await this.articleRepository.save(article);
+    return article;
+  }
+
+  async deleteArticleToFavorites(
+    slug: string,
+    currentUserId: number,
+  ): Promise<ArticleEntity> {
+    const article = await this.findBySlug(slug);
+    const user = await this.userRepository.findOne({
+      where: {
+        id: currentUserId,
+      },
+      relations: ['favorites'],
+    });
+    const articleIndex = user.favorites.findIndex(
+      (articlesInFavorites) => articlesInFavorites.id === article.id,
+    );
+
+    if (articleIndex >= 0) {
+      delete user.favorites[articleIndex];
+      article.favoritescount--;
+      await this.userRepository.save(user);
+      await this.articleRepository.save(article);
+    }
 
     return article;
   }
